@@ -6,11 +6,11 @@
       this.playing = false;
       this.game_over = false;
       this.bars = [];
-      this.ball = null 
+      this.ball = null;
     }
   self.Board.prototype = {
     get elements(){
-      var elements = this.bars.map(function(bar){return bar});
+      var elements = this.bars.map(function(bar){return bar;});
       elements.push(this.ball);
       return elements;
     }
@@ -19,15 +19,21 @@
 
 (function(){
   self.Ball = function(x,y,radius,board){
-    this.x =x;
-    this.y=y;
+    this.x = x;
+    this.y = y;
     this.radius = radius;
     this.speed_y = 0;
-    this.peed_x = 3;
+    this.speed_x = 1;
     this.board = board;
-
+    this.direction = 1;
     board.ball = this;
     this.kind = "circle";
+  }
+  self.Ball.prototype = {
+    move: function(){
+      this.x += (this.speed_x * this.direction);
+      this.y += (this.speed_y);
+    }
   }
 })();
 
@@ -77,9 +83,12 @@ self.Bar.prototype = {
         }
       },
       play: function(){
-        this.clean()
-        this.draw()
+        if(this.board.playing){
+        this.clean();
+        this.draw();
+        this.board.ball.move();
       }
+    }
     }
 
     function draw(ctx,element){
@@ -102,32 +111,45 @@ var bar_2 = new Bar(700,100,40,100,board);
 var canvas = document.getElementById('canvas');
 var board_view = new BoardView(canvas,board);
 var ball = new Ball(350, 100, 10,board)
-
 window.requestAnimationFrame(controller);
+
+setTimeout(function(){
+  for(var i = 0;i < 100;i++){
+  ball.direction = -1;
+  }
+},1000)
+
 //Función para mover las barras con las flechas del teclado
 document.addEventListener("keydown", (ev)=>{
   if(ev.keyCode == 87){
+    ev.preventDefault();
     bar.up();
     //KeyUp
   }
   else if(ev.keyCode == 83){
+    ev.preventDefault();
     bar.down();
     //KeyDown
   }
   if(ev.keyCode == 38){
+    ev.preventDefault();
     bar_2.up();
     //W
   }
 
   else if(ev.keyCode == 40){
+    ev.preventDefault();
     bar_2.down();
     //S
+  }else if(ev.keyCode == 32){
+    ev.preventDefault();
+    board.playing = !board.playing;
   }
 
-  console.log(""+bar);
-})
+});
 
 window.addEventListener("load",controller);
+
 //Controlador
 function controller(){
   board_view.play();
