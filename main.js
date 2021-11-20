@@ -34,9 +34,29 @@
     this.kind = "circle";
   }
   self.Ball.prototype = {
-    move: function(){
-      this.x += (this.speed_x * this.direction);
-      this.y += (this.speed_y);
+    move: function () {
+      this.x += this.speed_x * this.direction;
+      this.y += this.speed_y;
+
+      // Colisión con paredes verticales de acuerdo al tamaño del board
+			if (this.x <= (this.board.width - this.board.width) + 10) {
+				this.speed_x = -this.speed_x;
+				this.bounceAngle = -this.bounceAngle;
+			}
+			if (this.x >=  this.board.width - 10) {
+				this.speed_x = -this.speed_x;
+				this.bounceAngle = -this.bounceAngle;
+			}
+
+      // Colisión con paredes horizontales de acuerdo al tamaño del board
+			if (this.y <= (this.board.height - this.board.height) + 10) {
+				this.speed_y = -this.speed_y;
+				this.bounceAngle = -this.bounceAngle;
+			}
+			if (this.y >= this.board.height - 10) {
+				this.speed_y = -this.speed_y;
+				this.bounceAngle = -this.bounceAngle;
+			}
     },
 
     get width(){
@@ -109,14 +129,18 @@ self.Bar.prototype = {
           draw(this.ctx,el);
         };
       },
-      check_collisions: function(){
-        for(var i = this.board.bars.length -1;i >= 0;i--){
+
+      
+      check_collisions: () => {
+        for(var i = this.board.bars.length-1;i >= 0;i--){
           var  bar = this.board.bars[i];
           if(hit(bar, this.board.ball)){
             this.board.ball.collision(bar);
           }
         }
       },
+
+
       play: function(){
         if(this.board.playing){
         this.check_collisions();
